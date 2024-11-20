@@ -5,22 +5,22 @@ using namespace std;
 
 struct acaoPrograma {
     int identificador;
-    string nomeAcao;
+    string nameAcao;
     int tempoExecucao;
     int tempoConsumido;
 };
 
-class noh {
+class Node {
 friend class listadup;
 private:
     acaoPrograma acao;
-    noh* proximo;
-    noh* anterior;
+    Node* proximo;
+    Node* anterior;
 public:
-    noh(acaoPrograma d);
+    Node(acaoPrograma d);
 };
 
-noh::noh(acaoPrograma d) {
+Node::Node(acaoPrograma d) {
     acao = d;
     proximo = NULL;
     anterior = NULL;
@@ -28,8 +28,8 @@ noh::noh(acaoPrograma d) {
 
 class listadup {
 private:
-    noh* primeiro;
-    noh* ultimo;
+    Node* primeiro;
+    Node* ultimo;
     int tamanho;
     void removeTodos();
 public:
@@ -40,9 +40,9 @@ public:
     void insereNoFim(acaoPrograma acao);
     void insereNoInicio(acaoPrograma acao);
     void insereNaPosicao(int posicao, acaoPrograma acao);
-    int procura(string valor);
+    int procura(string value);
     void imprime();
-    inline bool vazia();
+    inline bool Empty();
     void removeNoFim();
     void removeNoInicio();
 };
@@ -58,9 +58,9 @@ listadup::~listadup() {
 }
 
 void listadup::removeTodos() {
-    noh* aux = primeiro;
+    Node* aux = primeiro;
     while (aux != NULL) {
-        noh* temp = aux;
+        Node* temp = aux;
         aux = aux->proximo;
         delete temp;
     }
@@ -70,8 +70,8 @@ void listadup::removeTodos() {
 }
 
 void listadup::insereNoFim(acaoPrograma acao) {
-    noh* novo = new noh(acao);
-    if (vazia()) {
+    Node* novo = new Node(acao);
+    if (Empty()) {
         primeiro = novo;
         ultimo = novo;
     } else {
@@ -83,8 +83,8 @@ void listadup::insereNoFim(acaoPrograma acao) {
 }
 
 void listadup::insereNoInicio(acaoPrograma acao) {
-    noh* novo = new noh(acao);
-    if (vazia()) {
+    Node* novo = new Node(acao);
+    if (Empty()) {
         primeiro = novo;
         ultimo = novo;
     } else {
@@ -96,17 +96,17 @@ void listadup::insereNoInicio(acaoPrograma acao) {
 }
 
 void listadup::insereNaPosicao(int posicao, acaoPrograma acao) {
-    noh* novo = new noh(acao);
+    Node* novo = new Node(acao);
 
     if ((posicao <= tamanho) && (posicao >= 0)){
-        if (vazia()) {
+        if (Empty()) {
             insereNoInicio(acao);
         } else if (posicao == 0) {
             insereNoInicio(acao);
         } else if (posicao == tamanho) {
             insereNoFim(acao);
         } else {
-            noh* aux = primeiro;
+            Node* aux = primeiro;
             int posAux = 0;
 
             while (posAux != (posicao - 1)) {
@@ -125,15 +125,15 @@ void listadup::insereNaPosicao(int posicao, acaoPrograma acao) {
     }
 }
 
-int listadup::procura(string valor) {
-    if (vazia()) {
-        throw runtime_error("Lista vazia!");
+int listadup::procura(string value) {
+    if (Empty()) {
+        throw runtime_error("Lista Empty!");
     }
 
-    noh* aux = primeiro;
+    Node* aux = primeiro;
     int posAux = 0;
 
-    while ((aux != NULL) && (aux->acao.nomeAcao != valor)){
+    while ((aux != NULL) && (aux->acao.nameAcao != value)){
         aux = aux->proximo;
         posAux++;
     }
@@ -143,46 +143,47 @@ int listadup::procura(string valor) {
         return -1;
     }
 
+    cout << posAux << endl;
     return posAux;
 }
 
 void listadup::imprime() {
-    if (vazia()) {
-        cout << "Lista vazia!" << endl;
+    if (Empty()) {
+        cout << "Lista Empty!" << endl;
         return;
     }
 
-    noh* aux = primeiro;
+    Node* aux = primeiro;
     while (aux != NULL) {
         cout << "(" << aux->acao.identificador << ", "
-             << aux->acao.nomeAcao << ", "
+             << aux->acao.nameAcao << ", "
              << aux->acao.tempoExecucao << ", "
              << aux->acao.tempoConsumido << ")" << endl;
         aux = aux->proximo;
     }
 
-    cout << "  IMPRIMINDO REVERSO " << endl;
+    cout << "IMPRIMINDO REVERSO " << endl;
 
     aux = ultimo;
     while (aux != NULL) {
         cout << "(" << aux->acao.identificador << ", "
-             << aux->acao.nomeAcao << ", "
+             << aux->acao.nameAcao << ", "
              << aux->acao.tempoExecucao << ", "
              << aux->acao.tempoConsumido << ")" << endl;
         aux = aux->anterior;
     }
 }
 
-inline bool listadup::vazia() {
+inline bool listadup::Empty() {
     return (primeiro == NULL);
 }
 
 void listadup::removeNoInicio() {
-    if (vazia()) {
-        cout << "Remoção em lista vazia!" << endl;
+    if (Empty()) {
+        cout << "Remoção em lista Empty!" << endl;
         return;
     }
-    noh* aux = primeiro;
+    Node* aux = primeiro;
     primeiro = primeiro->proximo;
     if (primeiro != NULL) {
         primeiro->anterior = NULL;
@@ -194,8 +195,8 @@ void listadup::removeNoInicio() {
 }
 
 void listadup::removeNoFim() {
-    if (vazia()) {
-        cout << "Remoção em lista vazia!" << endl;
+    if (Empty()) {
+        cout << "Remoção em lista Empty!" << endl;
         return;
     }
     if (primeiro == ultimo) {
@@ -203,7 +204,7 @@ void listadup::removeNoFim() {
         primeiro = NULL;
         ultimo = NULL;
     } else {
-        noh* atual = primeiro;
+        Node* atual = primeiro;
         while (atual->proximo != ultimo) {
             atual = atual->proximo;
         }
@@ -217,29 +218,29 @@ void listadup::removeNoFim() {
 int main() {
     listadup minhaLista;
     acaoPrograma info;
-    char comando;
+    char comand;
     int posicao;
-    string nomeAcao;
+    string nameAcao;
 
     do {
         try {
-            cin >> comando;
-            switch (comando) {
+            cin >> comand;
+            switch (comand) {
                 case 'i':
-                    cin >> info.identificador >> info.nomeAcao >> info.tempoExecucao >> info.tempoConsumido;
+                    cin >> info.identificador >> info.nameAcao >> info.tempoExecucao >> info.tempoConsumido;
                     minhaLista.insereNoInicio(info);
                     break;
                 case 'h':
-                    cin >> info.identificador >> info.nomeAcao >> info.tempoExecucao >> info.tempoConsumido;
+                    cin >> info.identificador >> info.nameAcao >> info.tempoExecucao >> info.tempoConsumido;
                     minhaLista.insereNoFim(info);
                     break;
                 case 'm':
-                    cin >> posicao >> info.identificador >> info.nomeAcao >> info.tempoExecucao >> info.tempoConsumido;
+                    cin >> posicao >> info.identificador >> info.nameAcao >> info.tempoExecucao >> info.tempoConsumido;
                     minhaLista.insereNaPosicao(posicao, info);
                     break;
                 case 's':
-                    cin >> nomeAcao;
-                    minhaLista.procura(nomeAcao);
+                    cin >> nameAcao;
+                    minhaLista.procura(nameAcao);
                     break;
                 case 'r':
                     minhaLista.removeNoInicio();
@@ -254,6 +255,6 @@ int main() {
         } catch (runtime_error& e) {
             cout << e.what() << endl;
         }
-    } while (comando != 'f');
+    } while (comand != 'f');
     return 0;
 }
