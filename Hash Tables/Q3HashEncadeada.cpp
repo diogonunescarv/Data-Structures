@@ -70,18 +70,35 @@ class lista {
         // Remove o noh com dada chave da lista.
         // Se a chave não existe, retorna informação.
         bool remove(const string& c) {
-            
-        }
-        
-        void removeNoInicio() {
             if (vazia()) {
-                //cout << "Remoção em lista vazia!" << endl;
-                return;
+                return false; // Lista vazia, não há nada para remover
             }
-            noh* aux = primeiro;
-            primeiro = primeiro->proximo;
-            delete aux;
-            numElementos--;
+
+            noh* atual = primeiro;
+            noh* anterior = NULL;
+
+            // Percorrer a lista para encontrar o nó com a chave correspondente
+            while (atual != NULL && atual->chave != c) {
+                anterior = atual;
+                atual = atual->proximo;
+            }
+
+            // Verificar se a chave foi encontrada
+            if (atual == NULL) {
+                return false; // Chave não encontrada
+            }
+
+            // Caso especial: o nó a ser removido é o primeiro
+            if (anterior == NULL) {
+                primeiro = atual->proximo; // Atualizar o início da lista
+            } else {
+                anterior->proximo = atual->proximo; // Remover o nó no meio ou fim
+            }
+
+            delete atual; // Liberar a memória
+            numElementos--; // Atualizar o número de elementos
+
+            return true; // Remoção bem-sucedida
         }
         
         // verifica se a lista está vazia
@@ -93,6 +110,9 @@ class lista {
         // o valor buscado é retornado por passagem por referência
         // na variável valorBuscado
         bool busca(const string& c, char& tipoBuscado, int& valorBuscado) {
+            if (vazia()) {
+                return false; // Lista vazia, não há nada para remover
+            }
             noh* aux = primeiro;
             for (int i = 0; i<numElementos; i++){
                 if(c == aux->chave){
@@ -102,6 +122,7 @@ class lista {
                 }
                 aux = aux->proximo;
             }
+
             return false; 
         }
         
@@ -152,16 +173,57 @@ class tabelaHash {
     public:
         // construtor padrão
         tabelaHash(unsigned cap = 100) {
-
+            numPosicoes = cap;
+            tabela = new lista[numPosicoes];
         }
-        ~tabelaHash(){ }
+
+        ~tabelaHash(){
+            delete[] tabela;
+        }
+        
         // Insere um nó com dada chave e valor.
-        bool insere(const string& c, char& t, const int& v) {}
+        bool insere(const string& c, char& t, const int& v) {
+            unsigned pos = funcaoHash(c);
+
+            tabela[pos].insere(c, t, v);
+
+            cout << "chave '" + c + "' inserida na posicao " << pos << endl;  
+
+            return true;
+        }
+
         // Retorna um valor associado a uma dada chave.
         // Se a chave não existe, retorna "NÃO ENCONTRADO!".
-        bool valor(const string& c, char& tipoBuscado, int& valorRetorno) {   }
+        bool valor(const string& c, char& tipoBuscado, int& valorRetorno) {
+            unsigned pos = funcaoHash(c);
+
+            /**if (tabela[pos].vazia()){
+                cout << "Erro: hash vazia!" << endl;
+                return false;
+            } else **/ 
+            if (!tabela[pos].busca(c, tipoBuscado, valorRetorno)){
+                cout << "Elemento inexistente!" << endl;
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         // Retira do hash um nó com dada chave.
-        bool remove(const string& c) {  }
+        bool remove(const string& c) { 
+            unsigned pos = funcaoHash(c);
+            /**if (tabela[pos].vazia()){
+                cout << "Erro: hash vazia!" << endl;
+                return false;
+            } else **/ 
+            if (!tabela[pos].remove(c)){
+                cout << "Elemento inexistente!" << endl;
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         // Imprime o conteúdo interno do hash (para fins de depuração)
         void imprime() {
             for (unsigned i = 0; i < numPosicoes; i++) {
@@ -186,20 +248,17 @@ int main() {
             switch (comando) {
                 case 'i': // inserir
                     cin >> chave >> tipo>> valor;
-                    if (not tabela.insere(chave, tipo, valor))
-                        cout << "Erro na inserção: chave já existente!" << endl;
+                    tabela.insere(chave, tipo, valor);
                     break;
                 case 'r': // remover
                     cin >> chave;
-                    if (not tabela.remove(chave))
-                        cout << "Erro na remoção: chave não encontrada!" << endl;
+                    tabela.remove(chave);
                     break;
                 case 'l': // remover
                     cin >> chave;
-                    if (not tabela.valor(chave,tipo,valor))
-                        cout << "Erro na busca: chave não encontrada!" << endl;
-                    else
+                    if (tabela.valor(chave,tipo,valor)){
                         cout << "Tipo: " << tipo << " Valor: " << valor << endl;
+                    }
                     break;
                 case 'p': // mostrar estrutura
                     tabela.imprime();

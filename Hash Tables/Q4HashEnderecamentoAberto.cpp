@@ -1,8 +1,3 @@
-/* 
- * Tabela Hash com tratamento de colisão por endereçamento aberto
- * by Joukim, 2019
- */ 
-
 #include <iostream>
 #include <exception>
 
@@ -98,7 +93,7 @@ void hashEA::inserir(const string& assunto, const string& interessado, const cha
     if (interessado.empty()) 
         throw invalid_argument("Chave inválida.");
     if (tamanho == capacidade) 
-        throw runtime_error("Tabela hash cheia.");
+        throw runtime_error("Erro: hash cheia!");
 
     if (buscarChave(interessado) != POSINVALIDA)   
         throw runtime_error("Inserção de chave que já existe.");
@@ -116,7 +111,6 @@ void hashEA::inserir(const string& assunto, const string& interessado, const cha
 }
 
 void hashEA::imprimir() {
-    // Mostra todos as posições de armazenamento da hash.
     for (unsigned i = 0; i < capacidade; ++i) {
         cout << '[' << i << ":";
         if (vetDados[i] != INVALIDO) {
@@ -127,25 +121,35 @@ void hashEA::imprimir() {
         }
         cout << "] ";
     }
+    cout << endl;
 }
 
 void hashEA::remover(const string& chave) {
-    if (tamanho == 0) 
-        throw runtime_error("Impossível remover de hash vazia.");
+    if (tamanho == 0) {
+        cout << "Erro: hash vazia!" << endl;
+        return;
+    }
     
     int pos = buscarChave(chave);
-    if (pos == POSINVALIDA) 
-        throw runtime_error("Chave não encontrada para remoção.");
+    if (pos == POSINVALIDA) {
+        cout << "Elemento inexistente!" << endl;
+        return;
+    }
 
     vetDados[pos] = REMOVIDO;
     tamanho--;
 }
 
-int hashEA::consultar(const std::string& chave) {
-    // Retorna o valor associado a uma chave.
+int hashEA::consultar(const string& chave) {
+    if (tamanho == 0) {
+        cout << "Erro: hash vazia!" << endl;
+        return POSINVALIDA;
+    }
     int pos = buscarChave(chave);
-    if (pos == POSINVALIDA) 
-        throw runtime_error("Chave não encontrada para consulta.");
+    if (pos == POSINVALIDA) {
+        cout << "Elemento inexistente!" << endl;
+        return POSINVALIDA;
+    }
 
     return vetDados[pos].numeroProcesso;
 }
@@ -161,25 +165,24 @@ int main() {
         try {
             cin >> operacao;
             switch (operacao) {
-                case 'i': // inserir
-                    cin >> assunto>> interessado >> tipo >> valor;
+                case 'i': 
+                    cin >> assunto >> interessado >> tipo >> valor;
                     tabela.inserir(assunto, interessado, tipo, valor);
                     break;
-                case 'r': // remover
+                case 'r': 
                     cin >> interessado;
                     tabela.remover(interessado);
                     break;
-                case 'l': // consultar
+                case 'l': 
                     cin >> interessado;
                     valor = tabela.consultar(interessado);
-                    cout << valor << endl;
+                    if (valor != POSINVALIDA)
+                        cout << valor << endl;
                     break;
-                case 'p': // debug (mostrar estrutura)
+                case 'p': 
                     tabela.imprimir();
-                    cout << endl;
                     break;
-                case 'f': // finalizar
-                    // vai testar depois
+                case 'f': 
                     break;
                 default:
                     cerr << "operação inválida" << endl;
