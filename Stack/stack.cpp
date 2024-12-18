@@ -1,5 +1,3 @@
-// Stack (linked) implementation in C++
-
 #include <iostream>
 #include <stdexcept>
 
@@ -11,66 +9,68 @@ struct Data {
   int value;
 };
 
-// Prints the information of a given Data
+// Prints the information of a given Data.
 void print_Data(const Data &newData) {
-  cout << "name: " << newData.name << " type: " << newData.type
-       << " value: " << newData.value << endl;
+  cout << "Name: " << newData.name << " | Type: " << newData.type
+       << " | Value: " << newData.value << endl;
 }
 
 class Node {
   friend class Stack;
 
 private:
-  Data mData; // Could be another type of variable
-  Node *mNext;
+  Data mData; // Stores the data for the node.
+  Node *mNext; // Pointer to the next node.
 
 public:
   Node(Data v) {
     mData = v;
-    mNext = NULL;
+    mNext = nullptr;
   }
 };
 
 class Stack {
 public:
-  // Constructs an empty Stack.
+  // Constructs an empty stack.
   Stack();
   // Destructor that deallocates memory.
   ~Stack();
-  // Removes and returns the value at the top of the Stack.
-  // Displays an error message if it's not possible to unstack.
-  Data Unstack(); // Returns the top of the Stack.
-  // Inserts a value into the Stack.
+  // Removes and returns the data at the top of the stack.
+  // Throws an error if the stack is empty.
+  Data Unstack();
+  // Inserts a new data element onto the stack.
   void Pile(const Data &d);
-  // Clears all elements from the Stack.
+  // Clears all elements from the stack.
   void Clear();
-  // Prints the value at the top of the Stack without unstacking it.
-  inline void Top();
-  // Checks if the Stack is empty.
-  inline bool Empty();
+  // Displays the data at the top of the stack without removing it.
+  void Top();
+  // Checks if the stack is empty.
+  bool Empty();
 
 private:
-  Node *PilemPtTop;
+  Node *mTop; // Pointer to the top node of the stack.
 };
 
-Stack::Stack() { PilemPtTop = nullptr; }
+Stack::Stack() { mTop = nullptr; }
 
 Stack::~Stack() { Clear(); }
 
 Data Stack::Unstack() {
   if (this->Empty())
-    throw runtime_error("Error: Empty Stack!");
-  Data auxData = PilemPtTop->mData;
-  Node *aux = PilemPtTop;
-  PilemPtTop = PilemPtTop->mNext;
-  delete aux;
-  return auxData;
+    throw runtime_error("Error: Stack is empty!");
+
+  Data topData = mTop->mData; // Save data from the top node.
+  Node *temp = mTop;          // Temporary pointer to the current top node.
+  mTop = mTop->mNext;         // Move the top pointer to the next node.
+  delete temp;                // Free memory of the removed node.
+
+  return topData;
 }
 
 void Stack::Pile(const Data &d) {
   Node *newNode = new Node(d);
-  newNode->mNext = PilemPtTop;
-  PilemPtTop = newNode;
+  newNode->mNext = mTop; // Link the new node to the current top.
+  mTop = newNode;        // Update the top pointer.
 }
 
 void Stack::Clear() {
@@ -81,13 +81,15 @@ void Stack::Clear() {
 
 void Stack::Top() {
   if (this->Empty())
-    throw runtime_error("Error: Empty Stack!");
-  cout << "name: " << PilemPtTop->mData.name << " type: " << PilemPtTop->mData.type
-       << " value: " << PilemPtTop->mData.value << endl;
+    throw runtime_error("Error: Stack is empty!");
+
+  cout << "Top -> Name: " << mTop->mData.name
+       << " | Type: " << mTop->mData.type
+       << " | Value: " << mTop->mData.value << endl;
 }
 
 bool Stack::Empty() {
-  return PilemPtTop == nullptr;
+  return mTop == nullptr;
 }
 
 int main() {
@@ -99,35 +101,34 @@ int main() {
     try {
       cin >> command;
       switch (command) {
-      case 'i': // insert
+      case 'i': // Insert a new element
         cin >> info.name >> info.type >> info.value;
         stack.Pile(info);
         break;
-      case 'r': // remove
+      case 'r': // Remove the top element
         print_Data(stack.Unstack());
         break;
-      case 'l': // clear all
+      case 'l': // Clear all elements
         stack.Clear();
         break;
-      case 's': // spy (view top element)
+      case 's': // View the top element
         stack.Top();
         break;
-      case 'f': // finish
-        // Checked in the do-while loop
+      case 'f': // Finish the program
         break;
       default:
-        cerr << "invalid command\n";
+        cerr << "Invalid command\n";
       }
-    } catch (runtime_error &e) {
+    } catch (const runtime_error &e) {
       cout << e.what() << endl;
     }
-  } while (command != 'f'); // finish execution
+  } while (command != 'f'); // Exit condition
 
+  // Print remaining elements in the stack.
   while (!stack.Empty()) {
     print_Data(stack.Unstack());
   }
 
   cout << endl;
-
   return 0;
 }

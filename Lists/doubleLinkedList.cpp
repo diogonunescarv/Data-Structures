@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 
-struct programAction {
+struct ProgramAction {
     int id;
     string action;
     int execTime;
@@ -11,65 +11,63 @@ struct programAction {
 };
 
 class Node {
-friend class doubleList;
+friend class DoublyLinkedList;
 private:
-    programAction action;
+    ProgramAction action;
     Node* next;
     Node* prev;
 public:
-    Node(programAction d);
+    Node(ProgramAction d);
 };
 
-Node::Node(programAction d) {
+Node::Node(ProgramAction d) {
     action = d;
-    next = NULL;
-    prev = NULL;
+    next = nullptr;
+    prev = nullptr;
 }
 
-class doubleList {
+class DoublyLinkedList {
 private:
     Node* first;
     Node* last;
     int size;
     void clear();
 public:
-    doubleList();
-    doubleList(const doubleList& aList);
-    ~doubleList();
-    doubleList& operator=(const doubleList& aList);
-    void insertLast(programAction action);
-    void insertFirst(programAction action);
-    void insertOnPosition(int position, programAction action);
-    int search(string value);
-    void print();
-    inline bool empty();
+    DoublyLinkedList();
+    ~DoublyLinkedList();
+    void insertLast(ProgramAction action);
+    void insertFirst(ProgramAction action);
+    void insertAtPosition(int position, ProgramAction action);
+    int search(const string& value) const;
+    void print() const;
+    inline bool empty() const;
     void removeLast();
     void removeFirst();
 };
 
-doubleList::doubleList() {
+DoublyLinkedList::DoublyLinkedList() {
     size = 0;
-    first = NULL;
-    last = NULL;
+    first = nullptr;
+    last = nullptr;
 }
 
-doubleList::~doubleList() {
+DoublyLinkedList::~DoublyLinkedList() {
     clear();
 }
 
-void doubleList::clear() {
+void DoublyLinkedList::clear() {
     Node* aux = first;
-    while (aux != NULL) {
+    while (aux != nullptr) {
         Node* temp = aux;
         aux = aux->next;
         delete temp;
     }
     size = 0;
-    first = NULL;
-    last = NULL;
+    first = nullptr;
+    last = nullptr;
 }
 
-void doubleList::insertLast(programAction action) {
+void DoublyLinkedList::insertLast(ProgramAction action) {
     Node* newNode = new Node(action);
     if (empty()) {
         first = newNode;
@@ -82,7 +80,7 @@ void doubleList::insertLast(programAction action) {
     size++;
 }
 
-void doubleList::insertFirst(programAction action) {
+void DoublyLinkedList::insertFirst(ProgramAction action) {
     Node* newNode = new Node(action);
     if (empty()) {
         first = newNode;
@@ -95,23 +93,18 @@ void doubleList::insertFirst(programAction action) {
     size++;
 }
 
-void doubleList::insertOnPosition(int position, programAction action) {
+void DoublyLinkedList::insertAtPosition(int position, ProgramAction action) {
     Node* newNode = new Node(action);
 
-    if ((position <= size) && (position >= 0)){
-        if (empty()) {
-            insertFirst(action);
-        } else if (position == 0) {
+    if (position >= 0 && position <= size) {
+        if (empty() || position == 0) {
             insertFirst(action);
         } else if (position == size) {
             insertLast(action);
         } else {
             Node* aux = first;
-            int posAux = 0;
-
-            while (posAux != (position - 1)) {
+            for (int i = 0; i < position - 1; ++i) {
                 aux = aux->next;
-                posAux++;
             }
 
             newNode->next = aux->next;
@@ -121,25 +114,25 @@ void doubleList::insertOnPosition(int position, programAction action) {
             size++;
         }
     } else {
-        cout << "Non-existent position!" << endl;
+        cout << "Invalid position!" << endl;
     }
 }
 
-int doubleList::search(string value) {
+int DoublyLinkedList::search(const string& value) const {
     if (empty()) {
-        throw runtime_error("Empty List!");
+        throw runtime_error("The list is empty!");
     }
 
     Node* aux = first;
     int posAux = 0;
 
-    while ((aux != NULL) && (aux->action.action != value)){
+    while (aux != nullptr && aux->action.action != value) {
         aux = aux->next;
         posAux++;
     }
 
-    if (aux == NULL) {
-        cout << "Not found!" << endl;
+    if (aux == nullptr) {
+        cout << "Value not found!" << endl;
         return -1;
     }
 
@@ -147,14 +140,14 @@ int doubleList::search(string value) {
     return posAux;
 }
 
-void doubleList::print() {
+void DoublyLinkedList::print() const {
     if (empty()) {
-        cout << "Empty List!" << endl;
+        cout << "The list is empty!" << endl;
         return;
     }
 
     Node* aux = first;
-    while (aux != NULL) {
+    while (aux != nullptr) {
         cout << "(" << aux->action.id << ", "
              << aux->action.action << ", "
              << aux->action.execTime << ", "
@@ -162,10 +155,10 @@ void doubleList::print() {
         aux = aux->next;
     }
 
-    cout << " PRINTING REVERSE " << endl;
+    cout << "PRINTING REVERSE" << endl;
 
     aux = last;
-    while (aux != NULL) {
+    while (aux != nullptr) {
         cout << "(" << aux->action.id << ", "
              << aux->action.action << ", "
              << aux->action.execTime << ", "
@@ -174,58 +167,55 @@ void doubleList::print() {
     }
 }
 
-inline bool doubleList::empty() {
-    return (first == NULL);
+inline bool DoublyLinkedList::empty() const {
+    return first == nullptr;
 }
 
-void doubleList::removeFirst() {
+void DoublyLinkedList::removeFirst() {
     if (empty()) {
-        cout << "Empty List Removal!" << endl;
+        cout << "Cannot remove from an empty list!" << endl;
         return;
     }
     Node* aux = first;
     first = first->next;
-    if (first != NULL) {
-        first->prev = NULL;
+    if (first != nullptr) {
+        first->prev = nullptr;
     } else {
-        last = NULL;
+        last = nullptr;
     }
     delete aux;
     size--;
 }
 
-void doubleList::removeLast() {
+void DoublyLinkedList::removeLast() {
     if (empty()) {
-        cout << "Empty List Removal!" << endl;
+        cout << "Cannot remove from an empty list!" << endl;
         return;
     }
     if (first == last) {
         delete first;
-        first = NULL;
-        last = NULL;
+        first = nullptr;
+        last = nullptr;
     } else {
-        Node* atual = first;
-        while (atual->next != last) {
-            atual = atual->next;
-        }
+        Node* aux = last->prev;
         delete last;
-        last = atual;
-        last->next = NULL;
+        last = aux;
+        last->next = nullptr;
     }
     size--;
 }
 
 int main() {
-    doubleList myList;
-    programAction info;
-    char comand;
+    DoublyLinkedList myList;
+    ProgramAction info;
+    char command;
     int position;
     string action;
 
     do {
         try {
-            cin >> comand;
-            switch (comand) {
+            cin >> command;
+            switch (command) {
                 case 'i':
                     cin >> info.id >> info.action >> info.execTime >> info.consumedTime;
                     myList.insertFirst(info);
@@ -236,7 +226,7 @@ int main() {
                     break;
                 case 'm':
                     cin >> position >> info.id >> info.action >> info.execTime >> info.consumedTime;
-                    myList.insertOnPosition(position, info);
+                    myList.insertAtPosition(position, info);
                     break;
                 case 's':
                     cin >> action;
@@ -255,6 +245,6 @@ int main() {
         } catch (runtime_error& e) {
             cout << e.what() << endl;
         }
-    } while (comand != 'f');
+    } while (command != 'f');
     return 0;
 }
