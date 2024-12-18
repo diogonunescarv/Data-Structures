@@ -4,7 +4,7 @@ This repository aims to take notes on topics learned during the Data Structures 
 
 **Attention:** 
 
-1. Some of the code is still in Portuguese; however, I'm working on translating all of it.
+1. Some of the code still in Portuguese; however, I'm working on translating all of it.
 
 ### Future Ideas: 
 
